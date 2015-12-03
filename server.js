@@ -39,8 +39,6 @@ app.use(express.static(path.join(__dirname, 'app')));
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', profileRoutes);
-app.use('/api/companies', companyRoutes);
-app.use('/api/courses', courseRoutes);
 app.use('/api/uploads', uploadRoutes);
 
 
