@@ -1,6 +1,6 @@
 angular.module('profile')
   .controller('ProfileController', function($scope,$auth, $alert, $http, Account, Transloadit) {
-    
+
     function getExpiryDate() {
       var date = new Date();
       date.setHours(date.getHours() + 12);
@@ -35,7 +35,7 @@ angular.module('profile')
             expires: getExpiryDate()
         },
         template_id: 'ab8cd0503a5d11e5a14e55ba3998e015',
-        notify_url: 'http://tiy-longtail.herokuapp.com/api/uploads/notify/' + userId,
+        notify_url: 'http://appname.herokuapp.com/api/uploads/notify/' + userId,
 
       },
       signature: function(callback) {

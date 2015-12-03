@@ -1,4 +1,4 @@
-angular.module('longtail')
+angular.module('mean-starter')
   .controller('NavbarCtrl', function($scope, $auth, authorizations) {
     $scope.checkRole = function (role) {
       return authorizations.checkRole(role);
