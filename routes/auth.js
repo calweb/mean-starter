@@ -120,15 +120,16 @@ router.route('/login')
           // Step 3b. Create a new user account or return an existing one.
           User.findOne({ google: profile.sub }, function(err, existingUser) {
             if (existingUser) { // need to send role back?
-              return res.send({ token: createToken(existingUser) });
+              return res.send({ token: createToken(existingUser), role: existingUser.role });
             }
             var user = new User();
             user.google = profile.sub;
             user.picture = profile.picture.replace('sz=50', 'sz=200');
             user.displayName = profile.name;
+            user.role = 'member';
             user.save(function(err) {
               var token = createToken(user);
-              res.send({ token: token });
+              res.send({ token: token, role: user.role });
             });
           });
         }

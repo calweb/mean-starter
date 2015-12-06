@@ -8,7 +8,8 @@ var userSchema = new mongoose.Schema({
   displayName: String,
   picture: String,
   google: String,
-  github: String
+  github: String,
+  tokens: Array
 });
 
 userSchema.pre('save', function(next) {
