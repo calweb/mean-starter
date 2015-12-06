@@ -6,6 +6,7 @@ var moment = require('moment');
 var jwt = require('jwt-simple');
 var config = require('../config');
 var mongoose = require('mongoose');
+var _ = require('lodash');
 var User = require('../models/User');
 var ensureAuthenticated = require('./helpers').ensureAuthenticated;
 
@@ -176,9 +177,10 @@ router.route('/github')
               user.github = profile.id;
               user.picture = user.picture || profile.avatar_url;
               user.displayName = user.displayName || profile.name;
+              user.tokens.push({provider: 'github', access: accessToken});
               user.save(function() {
                 var token = createToken(user);
-                res.send({ token: token });
+                res.send({ token: token, role: user.role });
               });
             });
           });
@@ -187,15 +189,17 @@ router.route('/github')
           User.findOne({ github: profile.id }, function(err, existingUser) {
             if (existingUser) {
               var token = createToken(existingUser);
-              return res.send({ token: token });
+              return res.send({ token: token, role: existingUser.role });
             }
             var user = new User();
             user.github = profile.id;
             user.picture = profile.avatar_url;
             user.displayName = profile.name;
+            user.role = 'member';
+            user.tokens.push({provider: 'github', access: accessToken});
             user.save(function() {
               var token = createToken(user);
-              res.send({ token: token });
+              res.send({ token: token, role: user.role });
             });
           });
         }
