@@ -1,0 +1,7 @@
+<a href="#/blogcreate">create post</a>
+<div ng-repeat="post in blogCtrl.posts" class="posts">
+    <h3>{{ post.title }}</h3>
+    <p>{{ post.content | limitTo:255 }} ... <a href="#/blog/{{ post._id }}">read more >></a></p>
+
+    <p>- {{ post.author }}</p>
+</div>

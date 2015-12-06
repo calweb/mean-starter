@@ -9,19 +9,19 @@
             $routeProvider
                 .when('/blog', {
                     templateUrl: 'blog/views/list.html',
-                    controller: 'BlogController'
+                    controller: 'BlogController as blogCtrl'
                 })
-                .when('/blog/create', {
+                .when('/blogcreate', {
                     templateUrl: 'blog/views/create.html',
-                    controller: 'BlogController'
+                    controller: 'BlogController as blogCtrl'
                 })
                 .when('/blog/:blogId', {
                     templateUrl: 'blog/views/show.html',
-                    controller: 'BlogController'
+                    controller: 'BlogController as blogCtrl'
                 })
                 .when('/blog/:blogId/edit', {
                     templateUrl: 'blog/views/edit.html',
-                    controller: 'BlogController'
+                    controller: 'BlogController as blogCtrl'
                 });
 
         })
