@@ -5,25 +5,119 @@ var request = require('request');
 var moment = require('moment');
 var jwt = require('jwt-simple');
 var config = require('../config');
-var mongoose = require('mongoose');
 var _ = require('lodash');
 var User = require('../models/User');
 var ensureAuthenticated = require('./helpers').ensureAuthenticated;
+var createToken = require('./helpers').createToken;
+var authom = require('authom');
 
-/*
- |--------------------------------------------------------------------------
- | Generate JSON Web Token
- |--------------------------------------------------------------------------
- */
-function createToken(user) {
-  var payload = {
-    sub: user._id,
-    role: user.role,
-    iat: moment().unix(),
-    exp: moment().add(14, 'days').unix()
-  };
-  return jwt.encode(payload, config.TOKEN_SECRET);
-}
+var normalize = function normalize(provider, respObj) {
+    var config = {
+        github: {
+            name: 'name',
+            picture: 'avatar_url'
+        },
+        instagram: {
+            name: 'data.username',
+            picture: 'data.profile_picture'
+        },
+        google: {
+            name: 'name',
+            picture: 'picture'
+        },
+        facebook: {
+            name: 'name',
+            picture: 'picture.data.url'
+        }
+    };
+    return {
+        name: _.get(respObj, config[provider].name),
+        picture: _.get(respObj, config[provider].picture)
+    };
+};
+
+
+authom.createServer({
+    service: "github",
+    id: config.GITHUB_CLIENTID,
+    secret: config.GITHUB_SECRET,
+    redirect_uri: "http://localhost:3000/auth/github"
+});
+authom.createServer({
+    service: "google",
+    id: config.GOOGLE_CLIENTID,
+    secret: config.GOOGLE_SECRET
+});
+
+authom.createServer({
+    service: "facebook",
+    id: config.FACEBOOK_CLIENTID,
+    secret: config.FACEBOOK_SECRET,
+    fields: ["name", "picture"]
+});
+
+authom.createServer({
+    service: "instagram",
+    id: config.INSTAGRAM_CLIENTID,
+    secret: config.INSTAGRAM_SECRET
+});
+
+router.route('/auth/:service')
+    .get(authom.app);
+
+
+authom.on("auth", function (req, res, data) {
+
+    var query = {};
+        query[data.service] = data.id;
+
+    if (req.headers.authorization) {
+        User.findOne(query, function (err, existingUser) {
+            if (existingUser) {
+                return res.status(409).send({message: 'There is already a Google account that belongs to you'});
+            }
+            var token = req.headers.authorization.split(' ')[1];
+            var payload = jwt.decode(token, config.TOKEN_SECRET);
+            User.findById(payload.sub, function (err, user) {
+                if (!user) {
+                    return res.status(400).send({message: 'User not found'});
+                }
+                user[data.service] = data.id;
+                user.tokens.push({provider: data.service, access: data.token});
+                user.picture = normalize(data.service, data.data).picture;
+                user.displayName = normalize(data.service, data.data).name || user.displayName;
+                user.save(function () {
+                    var token = createToken(user);
+                    res.send({token: token, role: user.role});
+                });
+            });
+        });
+    } else {
+
+
+        User.findOne(query, function (err, existingUser) {
+            if (existingUser) { // need to send role back?
+                return res.send({token: createToken(existingUser), role: existingUser.role});
+            }
+            var user = new User();
+            user[data.service] = data.id;
+            user.tokens.push({provider: data.service, access: data.token});
+            user.picture = normalize(data.service, data.data).picture;
+            user.displayName = normalize(data.service, data.data).name;
+            user.role = 'member';
+            user.save(function (err) {
+                var token = createToken(user);
+                res.send({token: token, role: user.role});
+            });
+        });
+    }
+
+});
+
+authom.on("error", function (req, res, data) {
+    res.status(500).send("An error occurred: " + JSON.stringify(data))
+})
+
 
 /*
  |--------------------------------------------------------------------------
@@ -32,199 +126,63 @@ function createToken(user) {
  */
 
 router.route('/login')
-  .post(function(req, res, next) {
-    User.findOne({ email: req.body.email }, '+password', function(err, user, next) {
-      if (err) return next(err);
-      if (!user) {
-        return res.status(401).send({ message: 'Wrong email and/or password' });
-      }
-      user.comparePassword(req.body.password, function(err, isMatch) {
-        if (!isMatch) {
-          return res.status(401).send({ message: 'Wrong email and/or password' });
-        }
-        res.send({ token: createToken(user), role: user.role });
-      });
+    .post(function (req, res, next) {
+        User.findOne({email: req.body.email}, '+password', function (err, user, next) {
+            if (err) return next(err);
+            if (!user) {
+                return res.status(401).send({message: 'Wrong email and/or password'});
+            }
+            user.comparePassword(req.body.password, function (err, isMatch) {
+                if (!isMatch) {
+                    return res.status(401).send({message: 'Wrong email and/or password'});
+                }
+                res.send({token: createToken(user), role: user.role});
+            });
+        });
     });
-  });
 
 /*
  |--------------------------------------------------------------------------
  | Create Email and Password Account
  |--------------------------------------------------------------------------
  */
- router.route('/signup')
-  .post(function(req, res) {
+router.route('/signup')
+    .post(function (req, res) {
 
-    User.findOne({ email: req.body.email }, function(err, existingUser) {
-      if (existingUser) {
-        return res.status(409).send({ message: 'Email is already taken' });
-      }
-      var user = new User({
-        displayName: req.body.displayName,
-        email: req.body.email,
-        password: req.body.password,
-        role: /@theironyard.com\s*$/.test(req.body.email) ? 'admin' : 'member'
-      });
-      user.save(function() {
-        res.send({ token: createToken(user), role: user.role });
-      });
-    });
-  });
-
-/*
- |--------------------------------------------------------------------------
- | Login with Google
- |--------------------------------------------------------------------------
- */
- router.route('/google')
-  .post(function(req, res) {
-    var accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
-    var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
-    var params = {
-      code: req.body.code,
-      client_id: req.body.clientId,
-      client_secret: config.GOOGLE_SECRET,
-      redirect_uri: req.body.redirectUri,
-      grant_type: 'authorization_code'
-    };
-
-    // Step 1. Exchange authorization code for access token.
-    request.post(accessTokenUrl, { json: true, form: params }, function(err, response, token) {
-      var accessToken = token.access_token;
-      var headers = { Authorization: 'Bearer ' + accessToken };
-
-      // Step 2. Retrieve profile information about the current user.
-      request.get({ url: peopleApiUrl, headers: headers, json: true }, function(err, response, profile) {
-
-        // Step 3a. Link user accounts.
-        if (req.headers.authorization) {
-          User.findOne({ google: profile.sub }, function(err, existingUser) {
+        User.findOne({email: req.body.email}, function (err, existingUser) {
             if (existingUser) {
-              return res.status(409).send({ message: 'There is already a Google account that belongs to you' });
+                return res.status(409).send({message: 'Email is already taken'});
             }
-            var token = req.headers.authorization.split(' ')[1];
-            var payload = jwt.decode(token, config.TOKEN_SECRET);
-            User.findById(payload.sub, function(err, user) {
-              if (!user) {
-                return res.status(400).send({ message: 'User not found' });
-              }
-              user.google = profile.sub;
-              user.picture = user.picture || profile.picture.replace('sz=50', 'sz=200');
-              user.displayName = user.displayName || profile.name;
-              user.save(function() {
-                var token = createToken(user);
-                res.send({ token: token, role: user.role });
-              });
+            var user = new User({
+                displayName: req.body.displayName,
+                email: req.body.email,
+                password: req.body.password,
+                role: /@theironyard.com\s*$/.test(req.body.email) ? 'admin' : 'member'
             });
-          });
-        } else {
-          // Step 3b. Create a new user account or return an existing one.
-          User.findOne({ google: profile.sub }, function(err, existingUser) {
-            if (existingUser) { // need to send role back?
-              return res.send({ token: createToken(existingUser), role: existingUser.role });
-            }
-            var user = new User();
-            user.google = profile.sub;
-            user.picture = profile.picture.replace('sz=50', 'sz=200');
-            user.displayName = profile.name;
-            user.role = 'member';
-            user.save(function(err) {
-              var token = createToken(user);
-              res.send({ token: token, role: user.role });
+            user.save(function () {
+                res.send({token: createToken(user), role: user.role});
             });
-          });
-        }
-      });
+        });
     });
-  });
-
-/*
- |--------------------------------------------------------------------------
- | Login with GitHub
- |--------------------------------------------------------------------------
- */
-router.route('/github')
-  .post(function(req, res) {
-    var accessTokenUrl = 'https://github.com/login/oauth/access_token';
-    var userApiUrl = 'https://api.github.com/user';
-    var params = {
-      code: req.body.code,
-      client_id: req.body.clientId,
-      client_secret: config.GITHUB_SECRET,
-      redirect_uri: req.body.redirectUri
-    };
-
-    // Step 1. Exchange authorization code for access token.
-    request.get({ url: accessTokenUrl, qs: params }, function(err, response, accessToken) {
-      accessToken = qs.parse(accessToken);
-      var headers = { 'User-Agent': 'Satellizer' };
-
-      // Step 2. Retrieve profile information about the current user.
-      request.get({ url: userApiUrl, qs: accessToken, headers: headers, json: true }, function(err, response, profile) {
-
-        // Step 3a. Link user accounts.
-        if (req.headers.authorization) {
-          User.findOne({ github: profile.id }, function(err, existingUser) {
-            if (existingUser) {
-              return res.status(409).send({ message: 'There is already a GitHub account that belongs to you' });
-            }
-            var token = req.headers.authorization.split(' ')[1];
-            var payload = jwt.decode(token, config.TOKEN_SECRET);
-            User.findById(payload.sub, function(err, user) {
-              if (!user) {
-                return res.status(400).send({ message: 'User not found' });
-              }
-              user.github = profile.id;
-              user.picture = user.picture || profile.avatar_url;
-              user.displayName = user.displayName || profile.name;
-              user.tokens.push({provider: 'github', access: accessToken});
-              user.save(function() {
-                var token = createToken(user);
-                res.send({ token: token, role: user.role });
-              });
-            });
-          });
-        } else {
-          // Step 3b. Create a new user account or return an existing one.
-          User.findOne({ github: profile.id }, function(err, existingUser) {
-            if (existingUser) {
-              var token = createToken(existingUser);
-              return res.send({ token: token, role: existingUser.role });
-            }
-            var user = new User();
-            user.github = profile.id;
-            user.picture = profile.avatar_url;
-            user.displayName = profile.name;
-            user.role = 'member';
-            user.tokens.push({provider: 'github', access: accessToken});
-            user.save(function() {
-              var token = createToken(user);
-              res.send({ token: token, role: user.role });
-            });
-          });
-        }
-      });
-    });
-  });
 
 /*
  |--------------------------------------------------------------------------
  | Unlink Provider
  |--------------------------------------------------------------------------
  */
- router.route('/unlink/:provider')
-  .all(ensureAuthenticated)
-  .get(function(req, res) {
-    var provider = req.params.provider;
-    User.findById(req.user, function(err, user) {
-      if (!user) {
-        return res.status(400).send({ message: 'User not found' });
-      }
-      user[provider] = undefined;
-      user.save(function() {
-        res.status(200).end();
-      });
+router.route('/unlink/:provider')
+    .all(ensureAuthenticated)
+    .get(function (req, res) {
+        var provider = req.params.provider;
+        User.findById(req.user, function (err, user) {
+            if (!user) {
+                return res.status(400).send({message: 'User not found'});
+            }
+            user[provider] = undefined;
+            user.save(function () {
+                res.status(200).end();
+            });
+        });
     });
-  });
 
 module.exports = router;

@@ -2,7 +2,13 @@ module.exports = {
   TOKEN_SECRET: process.env.TOKEN_SECRET || 'A hard to guess string',
   MONGO_URI: process.env.MONGOLAB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test',
   GOOGLE_SECRET: process.env.GOOGLE_SECRET || 'Google Client Secret',
-  GITHUB_SECRET: process.env.GITHUB_SECRET || 'GitHub Client Secret',
+  GOOGLE_CLIENTID: process.env.GOOGLE_CLIENTID || 'Google Client ID'
+  GITHUB_SECRET: process.env.GITHUB_SECRET || '3a04a123d88cec3560308019e36d6fd871a11996',
+  GITHUB_CLIENTID: process.env.GITHUB_CLIENTID || '3a04a123d88cec3560308019e36d6fd871a11996',
+  FACEBOOK_SECRET: process.env.FACEBOOK_SECRET || '3a04a123d88cec3560308019e36d6fd871a11996',
+  FACEBOOK_CLIENTID: process.env.FACEBOOK_CLIENTID || '3a04a123d88cec3560308019e36d6fd871a11996',
+  INSTAGRAM_SECRET: process.env.INSTAGRAM_SECRET || '3a04a123d88cec3560308019e36d6fd871a11996',
+  INSTAGRAM_CLIENTID: process.env.INSTAGRAM_CLIENTID || '3a04a123d88cec3560308019e36d6fd871a11996',
   TRANSLOADIT_SECRET: process.env.TRANSLOADIT_SECRET || 'Some secret',
   TRANSLOADIT_KEY: process.env.TRANSLOADIT_KEY || 'Some key'
 };

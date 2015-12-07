@@ -9,6 +9,8 @@ var userSchema = new mongoose.Schema({
   picture: String,
   google: String,
   github: String,
+  instagram: String,
+  facebook: String,
   tokens: Array
 });
 

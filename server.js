@@ -38,7 +38,7 @@ if (app.get('env') === 'production') {
 app.use(express.static(path.join(__dirname, 'app')));
 
 // Routes
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 app.use('/api', profileRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/collections', crudRoutes);
