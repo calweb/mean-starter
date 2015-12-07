@@ -7,7 +7,8 @@ angular.module('mean-starter', [
   'ng-transloadit',
   'auth',
   'admin',
-  'profile'
+  'profile',
+  'blog'
 ])
 
 .config(function($routeProvider) {
