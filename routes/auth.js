@@ -94,6 +94,7 @@ router.route('/login')
               if (!user) {
                 return res.status(400).send({ message: 'User not found' });
               }
+              console.log("profile information: ", profile);
               user.google = profile.sub;
               user.picture = user.picture || profile.picture.replace('sz=50', 'sz=200');
               user.displayName = user.displayName || profile.name;
@@ -112,6 +113,7 @@ router.route('/login')
             }
             var user = new User();
             user.google = profile.sub;
+            console.log(profile);
             user.picture = profile.picture.replace('sz=50', 'sz=200');
             user.displayName = profile.name;
             user.role = 'member';
