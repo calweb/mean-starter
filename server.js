@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+var methodOverride = require('method-override')
 var config = require('./config');
 var User = require('./models/User');
 var authRoutes = require('./routes/auth');
@@ -20,9 +21,10 @@ mongoose.connection.on('error', function() {
 var app = express();
 
 app.use(role.middleware());
-
+app.use(methodOverride())
 app.set('port', process.env.PORT || 3000);
 app.use(logger('dev'));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true

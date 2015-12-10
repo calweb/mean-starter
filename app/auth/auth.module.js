@@ -39,6 +39,14 @@ angular.module('auth', [
         redirectTo: '/'
       });
 
+      $authProvider.google({
+        clientId: '469379853070-g23rimletc4dddro1vcqvak3nk3gsrgm.apps.googleusercontent.com'
+      });
+
+      $authProvider.github({
+        clientId: '0ba2600b1dbdb756688b'
+      });
+
 
 
   });

@@ -39,14 +39,14 @@ router.route('/:collectionName/:id')
             res.json(result);
         })
     })
-    .put(function (req, res) {
+    .put(ensureAuthenticated, function (req, res) {
         delete req.body._id;
         req.collection.update(req.params.id, {$set: req.body}, function (e, result) {
             res.status(200).send(result);
         })
-        
+
     })
-    .delete(function (req, res, next) {
+    .delete(ensureAuthenticated, function (req, res, next) {
         req.collection.findById(req.params.id, function (e, result) {
             if(e) return next(e);
             result.remove(function () {

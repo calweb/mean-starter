@@ -31,7 +31,7 @@ angular.module('auth')
       $auth.authenticate(provider)
         .then(function(res) {
           console.log(res.data);
-
+          localStorage.setItem('userRole', res.data.role);
           $alert({
             content: 'You have successfully logged in',
             animation: 'fadeZoomFadeDown',
