@@ -2,9 +2,9 @@
     "use strict";
     angular
         .module('auth')
-        .factory('AuthParty', function ($http) {
+        .factory('AuthParty', function ($http, $auth) {
             var authenticate = function (provider) {
-              return $http.get('/auth/' + provider);
+              return $auth.authenticate(provider);
             };
             return {
                 loginorsignup: authenticate
