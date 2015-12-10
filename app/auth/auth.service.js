@@ -4,7 +4,7 @@
         .module('auth')
         .factory('AuthParty', function ($http) {
             var authenticate = function (provider) {
-              return $http.get'/auth/' + provider);
+              return $http.get('/auth/' + provider);
             };
             return {
                 loginorsignup: authenticate
