@@ -4,7 +4,7 @@
         .module('auth')
         .factory('AuthParty', function ($http) {
             var authenticate = function (provider) {
-              return $http.get('http://localhost:3000/auth/' + provider);
+              return $http.get('https//mean-starter.herokuapp.com/auth/' + provider);
             };
             return {
                 loginorsignup: authenticate
