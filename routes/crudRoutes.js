@@ -12,7 +12,7 @@ router.param('collectionName', function (req, res, next, collectionName) {
 
 // api/collections/:collectionName
 router.route('/:collectionName')
-    .get(function (req, res, next) {
+    .get(function (req, res) {
        req.collection.find({},function(e, results) {
 
            if (e) return next(e);
