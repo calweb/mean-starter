@@ -20,3 +20,17 @@ exports.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
   req.role = payload.role;
   next();
 };
+/*
+ |--------------------------------------------------------------------------
+ | Generate JSON Web Token
+ |--------------------------------------------------------------------------
+ */
+exports.createToken = function(user) {
+    var payload = {
+      sub: user._id,
+      role: user.role,
+      iat: moment().unix(),
+      exp: moment().add(14, 'days').unix()
+    };
+    return jwt.encode(payload, config.TOKEN_SECRET);
+  };

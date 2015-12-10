@@ -1,5 +1,5 @@
 angular.module('auth')
-  .controller('SignupCtrl', function($scope, $alert, $auth) {
+  .controller('SignupCtrl', function($scope, $alert, $auth, AuthParty) {
     $scope.signup = function() {
       $auth.signup({
         displayName: $scope.displayName,
@@ -24,5 +24,50 @@ angular.module('auth')
           });
         }
       });
+    };
+    $scope.signUpProvider = function(provider) {
+
+            AuthParty.loginorsignup(provider).then(function (res) {
+                console.log(res);
+            });
+            //$auth.authenticate(provider)
+            //  .then(function(res) {
+            //    console.log(res.data);
+            //
+            //    $alert({
+            //      content: 'You have successfully logged in',
+            //      animation: 'fadeZoomFadeDown',
+            //      type: 'material',
+            //      duration: 3
+            //    });
+            //  })
+            //  .catch(function(response) {
+            //    $alert({
+            //      content: response.data ? response.data.message : response,
+            //      animation: 'fadeZoomFadeDown',
+            //      type: 'material',
+            //      duration: 3
+            //    });
+            //  });
+
+      //$auth.authenticate(provider)
+      //    .then(function(res) {
+      //      console.log(res.data);
+      //
+      //      $alert({
+      //        content: 'You have successfully logged in',
+      //        animation: 'fadeZoomFadeDown',
+      //        type: 'material',
+      //        duration: 3
+      //      });
+      //    })
+      //    .catch(function(response) {
+      //      $alert({
+      //        content: response.data ? response.data.message : response,
+      //        animation: 'fadeZoomFadeDown',
+      //        type: 'material',
+      //        duration: 3
+      //      });
+      //    });
     };
   });

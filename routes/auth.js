@@ -9,21 +9,8 @@ var mongoose = require('mongoose');
 var _ = require('lodash');
 var User = require('../models/User');
 var ensureAuthenticated = require('./helpers').ensureAuthenticated;
+var createToken = require('./helpers').createToken;
 
-/*
- |--------------------------------------------------------------------------
- | Generate JSON Web Token
- |--------------------------------------------------------------------------
- */
-function createToken(user) {
-  var payload = {
-    sub: user._id,
-    role: user.role,
-    iat: moment().unix(),
-    exp: moment().add(14, 'days').unix()
-  };
-  return jwt.encode(payload, config.TOKEN_SECRET);
-}
 
 /*
  |--------------------------------------------------------------------------
