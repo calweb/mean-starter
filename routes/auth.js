@@ -98,7 +98,7 @@ router.route('/login')
               user.google = profile.sub;
               user.picture = user.picture || profile.picture.replace('sz=50', 'sz=200');
               user.displayName = user.displayName || profile.name;
-
+              user.email = profile.email;
               user.save(function() {
                 var token = createToken(user);
                 res.send({ token: token, role: user.role });
@@ -113,7 +113,7 @@ router.route('/login')
             }
             var user = new User();
             user.google = profile.sub;
-            console.log(profile);
+            user.email = profile.email;
             user.picture = profile.picture.replace('sz=50', 'sz=200');
             user.displayName = profile.name;
             user.role = 'member';
