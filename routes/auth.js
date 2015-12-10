@@ -5,7 +5,6 @@ var request = require('request');
 var moment = require('moment');
 var jwt = require('jwt-simple');
 var config = require('../config');
-var mongoose = require('mongoose');
 var _ = require('lodash');
 var User = require('../models/User');
 var ensureAuthenticated = require('./helpers').ensureAuthenticated;
@@ -98,6 +97,7 @@ router.route('/login')
               user.google = profile.sub;
               user.picture = user.picture || profile.picture.replace('sz=50', 'sz=200');
               user.displayName = user.displayName || profile.name;
+
               user.save(function() {
                 var token = createToken(user);
                 res.send({ token: token, role: user.role });
