@@ -3,3 +3,4 @@ app/vendor
 .DS_Store
 .sass-cache/
 .idea
+.env
