@@ -3,6 +3,8 @@ var args = require('yargs').argv;
 var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
+var env = require('gulp-env');
+
 
 var $ = require('gulp-load-plugins')({
   lazy: true,
@@ -79,6 +81,9 @@ gulp.task('inject', ['wiredep', 'sass'], function() {
 
 gulp.task('serve-dev', ['inject'], function() {
   var isDev = true;
+  env({
+    file: '.env.json'
+  });
   var nodemonOptions = {
     script: config.nodeServer,
     delayTime: 1,
