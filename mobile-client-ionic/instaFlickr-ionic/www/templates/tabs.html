@@ -1,0 +1,29 @@
+<!--
+Create tabs with an icon and label, using the tabs-positive style.
+Each tab's child <ion-nav-view> directive will have its own
+navigation history that also transitions its views in and out.
+-->
+<ion-tabs class="tabs-icon-top tabs-color-active-positive" ng-controller="TabController">
+
+  <!-- Flickr Interesting -->
+  <ion-tab title="Interesting Photos" icon-off="ion-image" icon-on="ion-images" href="#/tab/photos">
+    <ion-nav-view name="tab-photos"></ion-nav-view>
+  </ion-tab>
+
+  <!-- Favorites Tab -->
+  <ion-tab title="Favorites" icon-off="ion-android-favorite-outline" icon-on="ion-heart" badge="favs" badge-style="badge-assertive" on-select="clearFavs()" href="#/tab/favs">
+    <ion-nav-view name="tab-favs"></ion-nav-view>
+  </ion-tab>
+
+  <!-- Account Tab -->
+  <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
+    <ion-nav-view name="tab-account"></ion-nav-view>
+  </ion-tab>
+
+    <ion-tab ng-if="isAuthenticated()" title="Logout" on-select="logout()" icon="ion-log-out">
+    </ion-tab>
+
+
+
+
+</ion-tabs>

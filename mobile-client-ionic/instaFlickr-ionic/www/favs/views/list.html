@@ -1,0 +1,20 @@
+<ion-view view-title="My Favorites">
+  <ion-nav-buttons side="right" ng-controller="LoginController">
+      <button class="button button-light" on-tap="logout()">
+        Logout
+      </button>
+    </ion-nav-buttons>
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="pic in favPics" type="item-text-wrap" href="#/tab/favs/{{$index}}">
+        <img ng-src="{{pic.image}}">
+        <h2>{{pic.title}}</h2>
+        <p>{{pic.dt}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-assertive" ng-click="remove(chat)">
+          Delete
+        </ion-option-button>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

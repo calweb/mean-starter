@@ -1,0 +1,24 @@
+<ion-view view-title="Login" class="splash-page pane">
+  <ion-content scroll="false" class="scroll-content ionic-scroll scroll-content-false">
+        <div class="list list-inset">
+
+         <label class="item item-input">
+           <span class="input-label">Email</span>
+           <input type="email" name="email" ng-model="email" placeholder="calvin@dubz.com" required autofocus>
+         </label>
+
+          <label class="item item-input">
+            <span class="input-label">Password</span>
+           <input type="password" name="password" ng-model="password" placeholder="mahdonk"
+           required>
+         </label>
+
+         <button on-touch="login()" class="button button-full button-calm">Log in</button>
+         <button class="button button-full button-assertive" on-touch="authenticate('google')">
+           <span class="ion-social-googleplus"></span> Google
+         </button>
+
+    </div>
+
+  </ion-content>
+</ion-view>

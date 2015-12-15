@@ -1,0 +1,16 @@
+<ion-view view-title="{{favsCtrl.picDetail.title}}">
+  <ion-nav-buttons side="right" ng-controller="LoginController">
+      <button class="button button-light" on-tap="logout()">
+        Logout
+      </button>
+    </ion-nav-buttons>
+  <ion-content>
+
+
+        <img ng-src="{{favsCtrl.picDetail.image}}">
+        <h2>{{pic.title}}</h2>
+        <p>{{pic.dt}}</p>
+
+
+  </ion-content>
+</ion-view>

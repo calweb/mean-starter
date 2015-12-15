@@ -1,0 +1,12 @@
+{
+  "name": "HelloIonic",
+  "private": "true",
+  "devDependencies": {
+    "ionic": "driftyco/ionic-bower#1.1.1"
+  },
+  "dependencies": {
+    "moment": "~2.10.6",
+    "underscore": "~1.8.3",
+    "satellizer": "~0.13.1"
+  }
+}

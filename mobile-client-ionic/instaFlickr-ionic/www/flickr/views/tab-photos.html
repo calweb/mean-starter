@@ -1,0 +1,24 @@
+<ion-view view-title="Goombas">
+  <ion-content class="padding">
+    <ion-refresher
+       pulling-text="Pull to refresh..."
+       on-refresh="doRefresh()">
+     </ion-refresher>
+    <div ng-repeat="photo in photos" class="list card">
+      <div class="item item-avatar">
+        <img ng-src="img/{{peep}}.png">
+        <h2>{{photo.title}}</h2>
+        <p>{{photo.dt}}</p>
+      </div>
+
+      <div class="item item-image">
+        <img ng-src="{{photo.image}}">
+      </div>
+
+      <a class="item item-icon-left assertive" on-tap="addFavorite(photo)">
+        <i class="icon ion-heart"></i>
+        Like
+      </a>
+    </div>
+  </ion-content>
+</ion-view>
