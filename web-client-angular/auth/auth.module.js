@@ -40,12 +40,17 @@ angular.module('auth', [
       });
 
       $authProvider.google({
-        clientId: '469379853070-g23rimletc4dddro1vcqvak3nk3gsrgm.apps.googleusercontent.com'
+        clientId: '469379853070-g23rimletc4dddro1vcqvak3nk3gsrgm.apps.googleusercontent.com',
+        url: 'https://mean-starter.herokuapp.com/auth/google'
       });
 
       $authProvider.github({
-        clientId: '0ba2600b1dbdb756688b'
+        clientId: '0ba2600b1dbdb756688b',
+        url: 'https://mean-starter.herokuapp.com/auth/github'
       });
+      $authProvider.facebook({
+        clientId: 'facebook client id here'
+      })
 
 
 
